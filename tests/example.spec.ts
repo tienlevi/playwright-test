@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const searchItemText = "Search items...";
+const baseURL = "https://app.webera.finance";
 
 test("has title", async ({ page }) => {
   await page.goto("https://playwright.dev/");
@@ -37,6 +38,12 @@ test("get started link", async ({ page }) => {
 // });
 
 test("Screenshots", async ({ page }) => {
-  await page.goto("https://app.webera.finance");
+  await page.goto(baseURL);
   await page.screenshot({ path: "tests/images/fullpage.png", fullPage: true });
+});
+
+test('page should have title of "Dogs security blog"', async ({ page }) => {
+  await page.goto(baseURL);
+  const title = await page.title();
+  expect(title).toBe("webera");
 });
