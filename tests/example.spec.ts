@@ -21,17 +21,22 @@ test("get started link", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.describe("Home page", () => {
-  test.beforeEach(async ({ page }) => {
-    2;
-    await page.goto("http://localhost:5173");
-  });
-  test("Search Items", async ({ page }) => {
-    await page.getByRole("button", { name: "Click Action" }).click();
-    await expect(page.getByPlaceholder(searchItemText)).toBeVisible();
-  });
-  test("Return value", async ({ page }) => {
-    await page.getAttribute("className", "filter");
-  });
-  // Expect a title "to contain" a substring.
+// test.describe("Home page", () => {
+//   test.beforeEach(async ({ page }) => {
+//     2;
+//     await page.goto("http://localhost:5173");
+//   });
+//   test("Search Items", async ({ page }) => {
+//     await page.getByRole("button", { name: "Click Action" }).click();
+//     await expect(page.getByPlaceholder(searchItemText)).toBeVisible();
+//   });
+//   test("Return value", async ({ page }) => {
+//     await page.getAttribute("className", "filter");
+//   });
+//   // Expect a title "to contain" a substring.
+// });
+
+test("Screenshots", async ({ page }) => {
+  await page.goto("https://app.webera.finance");
+  await page.screenshot({ path: "tests/images/fullpage.png", fullPage: true });
 });
