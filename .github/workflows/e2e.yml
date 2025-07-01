@@ -12,12 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - name: install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: install playwright browsers
-        run: npx playwright install --with-deps
-      - name: npm run test:e2e
-        run: npm run test:e2e
+        run: pnpm exec playwright install --with-deps
+      - name: pnpm run test:e2e
+        run: pnpm test:e2e
 
   tests_e2e_netlify_prepare:
     name: Wait for deployment on Netlify
@@ -38,12 +44,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - name: install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: install playwright browsers
-        run: npx playwright install --with-deps
-      - name: npm run test:e2e
-        run: npm run test:e2e
+        run: pnpm exec playwright install --with-deps
+      - name: pnpm run test:e2e
+        run: pnpm test:e2e
         env:
           PLAYWRIGHT_TEST_BASE_URL: "https://deploy-preview-${{env.GITHUB_PR_NUMBER}}--pull-request.netlify.app/"
           DEBUG: pw:api
