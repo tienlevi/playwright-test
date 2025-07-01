@@ -45,5 +45,5 @@ test("Screenshots", async ({ page }) => {
 test('page should have title of "Dogs security blog"', async ({ page }) => {
   await page.goto(baseURL);
   const title = await page.title();
-  expect(title).toBe("webera");
+  expect(title).toBe("Webera Finance | DeFAI Abstraction Layer For Berachain");
 });
