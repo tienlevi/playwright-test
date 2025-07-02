@@ -10,11 +10,32 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Deploy to Vercel Action
-        uses: BetaHuhn/deploy-to-vercel-action@v1
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          node-version: "20"
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      - name: Debug Vercel CLI
+        run: |
+          echo $PATH
+          which vercel || echo "Vercel CLI not found"
+          vercel --version || echo "Vercel CLI not installed"
+      - name: Deploy to Vercel
+        env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          vercel --token $VERCEL_TOKEN --prod \
+            --meta githubCommitAuthorName=tienlevi \
+            --meta githubCommitAuthorLogin=tienlevi \
+            --meta githubCommitMessage="update: vercel org id" \
+            --meta githubCommitOrg=tienlevi \
+            --meta githubCommitRepo=playwright-test \
+            --meta githubCommitRef=refs/heads/main \
+            --meta githubCommitSha=7661024256039b6bbb85401c109f28e160bfadf9 \
+            --meta githubOrg=tienlevi \
+            --meta githubRepo=playwright-test \
+            --meta githubDeployment=1
