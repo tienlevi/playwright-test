@@ -1,4 +1,4 @@
-name: example - next.js
+name: example - static
 on:
   push:
     branches:
@@ -11,21 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          npm ci
-          npx vercel pull --yes --token=${VERCEL_TOKEN}
-        working-directory: example/nextjs
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_NEXTJS }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      - run: |
-          npx vercel build
-        if: github.event_name == 'pull_request_target'
-        working-directory: example/nextjs
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_NEXTJS }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       - uses: ./
         id: now-deployment-staging
         if: github.event_name == 'pull_request_target'
@@ -33,30 +18,22 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_NEXTJS }}
-          vercel-args: --prebuilt
-          working-directory: example/nextjs
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_STATIC }}
+          working-directory: example/static
           alias-domains: |
-            staging.nextjs.vercel-action.amond.dev
-            pr-{{PR_NUMBER}}.nextjs.vercel-action.amond.dev
+            staging.static.vercel-action.amond.dev
+            pr-{{PR_NUMBER}}.static.vercel-action.amond.dev
       - name: production or not
         id: prod_or_not
         run: |
           if [ "$REF" == 'refs/heads/master' ]
           then
-              echo "vercel-args=--prod --prebuilt" >> $GITHUB_OUTPUT
+              echo "vercel-args=--prod" >> $GITHUB_OUTPUT
           else
-              echo "vercel-args=--prebuilt" >> $GITHUB_OUTPUT
+              echo "vercel-args=" >> $GITHUB_OUTPUT
           fi
         env:
           REF: ${{ github.ref }}
-      - run: |
-          npx vercel build --prod
-        if: github.event_name == 'push'
-        working-directory: example/nextjs
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_NEXTJS }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       - uses: ./
         id: now-deployment-production
         if: github.event_name == 'push'
@@ -64,8 +41,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_NEXTJS }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_STATIC }}
           vercel-args: ${{ steps.prod_or_not.outputs.vercel-args }}
-          working-directory: example/nextjs
+          working-directory: example/static
           alias-domains: |
-            {{BRANCH}}.nextjs.vercel-action.amond.dev
+            {{BRANCH}}.static.vercel-action.amond.dev
