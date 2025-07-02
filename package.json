@@ -13,11 +13,13 @@
   "dependencies": {
     "@playwright/test": "^1.53.2",
     "@splinetool/react-spline": "^4.0.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-query": "^5.81.2",
     "@testing-library/jest-dom": "^6.6.3",
     "axios": "^1.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.11",
     "vercel": "^44.2.8"
   },
   "devDependencies": {
