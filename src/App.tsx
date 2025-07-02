@@ -23,30 +23,6 @@ function App() {
           <Posts />
         </div>
       </main>
-
-      {/* Commented search functionality */}
-      {/* <div className="mt-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search items..."
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-        />
-        <div
-          className="mt-2 max-h-[200px] overflow-auto rounded-lg border border-gray-200"
-        >
-          {filteredItems.map((item, index) => (
-            <div key={index} className="p-2 hover:bg-gray-100">{item}</div>
-          ))}
-        </div>
-        <button 
-          className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none transition-colors"
-          onClick={() => console.log("Clicked")}
-        >
-          Click Action
-        </button>
-      </div> */}
     </div>
   );
 }
