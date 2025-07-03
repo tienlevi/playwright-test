@@ -5,21 +5,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Comment Webpage Screenshot
-        uses: saadmk11/comment-webpage-screenshot@main
-        with:
-          # Optional, the action will create a new branch and
-          upload_to: github_branch # Or, imgur
-
-          capture_urls: "https://playwright-test-flax.vercel.app, http://localhost:5173"
-          # Optional
-          github_token: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
