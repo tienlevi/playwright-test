@@ -19,7 +19,7 @@ jobs:
 
           capture_urls: "https://playwright-test-flax.vercel.app/fullpage.png, http://localhost:5173/fullpage.png"
           # Optional
-          github_token: { { secrets.GITHUB_TOKEN } }
+          github_token: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
