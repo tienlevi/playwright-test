@@ -28,6 +28,7 @@ export default defineConfig({
   webServer: {
     command: "yarn dev",
   },
+  outputDir: "./src/tests",
 
   /* Configure projects for major browsers */
   projects: [
