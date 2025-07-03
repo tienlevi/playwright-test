@@ -7,15 +7,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: List directory contents
+        run: ls -R
 
       - name: Comment Webpage Screenshot
-        uses: tienlevi/playwright-test@main
+        uses: tienlevi/playwright-test@main # Verify this repository and branch
         with:
-          # Optional, the action will create a new branch and
-          upload_to: github_branch # Or, imgur
+          upload_to: github_branch
           capture_urls: "https://playwright-test-flax.vercel.app, http://localhost:5173"
-          # Optional
           github_token: ${{ secrets.GITHUB_TOKEN }}
