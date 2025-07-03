@@ -17,7 +17,7 @@ jobs:
           # Optional, the action will create a new branch and
           upload_to: github_branch # Or, imgur
 
-          capture_urls: "https://playwright-test-flax.vercel.app/fullpage.png, http://localhost:5173/fullpage.png"
+          capture_urls: "https://playwright-test-flax.vercel.app, http://localhost:5173"
           # Optional
           github_token: ${{ secrets.GITHUB_TOKEN }}
   deploy:
