@@ -1,21 +1,33 @@
-name: Build Image
+name: Playwright Tests with Screenshots
 on:
   push:
     branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [main]
+  workflow_dispatch: # Allows manual triggering
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: List directory contents
-        run: ls -R
-
-      - name: Comment Webpage Screenshot
-        uses: saadmk11/comment-webpage-screenshot@main
+      - uses: actions/setup-node@v4
         with:
-          upload_to: main
-          capture_urls: "https://playwright-test-flax.vercel.app, http://localhost:5173"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: 22
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - name: Upload screenshots
+        if: always() # Upload artifacts even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 30
