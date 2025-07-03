@@ -1,6 +1,8 @@
 import { useState } from "react";
 import useDebounce from "./hooks/useDebounce";
 import Posts from "./components/Posts";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,17 +14,18 @@ function App() {
   ).filter((item) => item.toLowerCase().includes(debounce.toLowerCase()));
 
   return (
-    <div className="mx-auto max-w-4xl p-4">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Posts Feed</h1>
-        <p className="text-gray-600">Browse through the latest posts</p>
-      </header>
+    <div className="flex flex-col min-h-screen">
+      <Header />
 
-      <main>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <Posts />
-        </div>
-      </main>
+      <div className="mx-auto max-w-4xl p-4 flex-grow">
+        <main>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <Posts />
+          </div>
+        </main>
+      </div>
+
+      <Footer />
     </div>
   );
 }

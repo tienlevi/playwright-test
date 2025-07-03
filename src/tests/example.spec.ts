@@ -22,7 +22,7 @@ test("Screenshots", async ({ page, request }) => {
 
   // Take screenshot with rendered UI
   await page.screenshot({
-    path: "src/tests/images/fullpage.png",
+    path: "public/fullpage.png",
     fullPage: true,
   });
 });
