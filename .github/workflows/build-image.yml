@@ -28,6 +28,6 @@ jobs:
         if: always() # Upload artifacts even if tests fail
         uses: actions/upload-artifact@v4
         with:
-          name: screenshots
-          path: screenshots/
+          name: images
+          path: src/tests/images
           retention-days: 30
