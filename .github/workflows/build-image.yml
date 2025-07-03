@@ -16,6 +16,6 @@ jobs:
       - name: Comment Webpage Screenshot
         uses: saadmk11/comment-webpage-screenshot@main
         with:
-          upload_to: github_branch
+          upload_to: main
           capture_urls: "https://playwright-test-flax.vercel.app, http://localhost:5173"
           github_token: ${{ secrets.GITHUB_TOKEN }}
