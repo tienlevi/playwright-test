@@ -14,7 +14,7 @@ jobs:
         run: ls -R
 
       - name: Comment Webpage Screenshot
-        uses: tienlevi/playwright-test@main # Verify this repository and branch
+        uses: saadmk11/comment-webpage-screenshot@main
         with:
           upload_to: github_branch
           capture_urls: "https://playwright-test-flax.vercel.app, http://localhost:5173"
