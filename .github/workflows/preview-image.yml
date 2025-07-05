@@ -15,13 +15,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issueNumber = context.issue.number;
-            const username = context.payload.issue.user.login;
-
+            import image from '../../src/tests/images/fullpage.png';
             const comment = [
-              `👋 Hey @${username} — thanks for opening an issue!`,
-              ``,
-              `Before we dive in, make sure to check out our [contributing guide](CONTRIBUTING.md) and see if this has already been reported.`,
               ``,
               `We appreciate your help! 💖`
             ].join('\n');
@@ -29,6 +24,5 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issueNumber,
               body: comment
             });
