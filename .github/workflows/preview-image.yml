@@ -8,9 +8,11 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: mshick/add-pr-comment@v2
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v4
         with:
-          message: |
-            **Hello** 
-            🌏
-            ![Image]('../../src/tests/images/fullpage.png')
+          issue-number: 1
+          body: |
+            This is a multi-line test comment
+            - With GitHub **Markdown** :sparkles:
+            - ![image](/src/tests/images/fullpage.png)
