@@ -4,17 +4,31 @@ on:
   pull_request:
 
 jobs:
-  example_comment_pr:
+  comment:
     runs-on: ubuntu-latest
-    name: An example job to comment a PR
+    permissions:
+      issues: write
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Comment PR
-        uses: allthatjazzleo/actions-pull-request-add-comment@master
-
+      - name: Comment on new issue
+        uses: actions/github-script@v7
         with:
-          message: "yoyo🤙🏻 ![image](/src/tests/images/fullpage.png)"
-          # message: "echo ${{ github.event.comment.body }}" dynamic message based on comment
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.issue.number;
+            const username = context.payload.issue.user.login;
+
+            const comment = [
+              `👋 Hey @${username} — thanks for opening an issue!`,
+              ``,
+              `Before we dive in, make sure to check out our [contributing guide](CONTRIBUTING.md) and see if this has already been reported.`,
+              ``,
+              `We appreciate your help! 💖`
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: comment
+            });
