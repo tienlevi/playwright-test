@@ -15,7 +15,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            import image from '../../src/tests/images/fullpage.png';
             const comment = [
               ``,
               `We appreciate your help! 💖`
