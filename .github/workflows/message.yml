@@ -13,3 +13,5 @@ jobs:
             **Hello**
             🌏
             !
+          message-path: |
+            fullpage.png
