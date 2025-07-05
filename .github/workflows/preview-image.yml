@@ -1,21 +1,16 @@
 name: Preview with Screenshots
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: An example job to comment a PR
+    permissions:
+      pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v3
+      - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            Hello world ! :wave:
-          file-path: /src/tests/images/fullpage.png
+            **Hello** 
+            🌏
+            ![Image]('../../src/tests/images/fullpage.png')
