@@ -2,17 +2,19 @@ name: Comment on Pull Request
 
 on:
   pull_request:
-    types: [opened, reopened]
 
 jobs:
-  post-comment:
+  example_comment_pr:
     runs-on: ubuntu-latest
+    name: An example job to comment a PR
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v1
 
       - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v1
+        uses: allthatjazzleo/actions-pull-request-add-comment@master
+
         with:
-          message: "![image](/src/tests/images/fullpage.png)"
+          message: "yoyo🤙🏻 ![image](/src/tests/images/fullpage.png)"
+          # message: "echo ${{ github.event.comment.body }}" dynamic message based on comment
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
