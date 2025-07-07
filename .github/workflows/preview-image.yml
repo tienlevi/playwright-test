@@ -12,21 +12,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install Vercel CLI
-        run: npm install -g vercel
       - name: Deploy to Vercel Action
         id: vercel-deploy
-        uses: BetaHuhn/deploy-to-vercel-action@latest
+        uses: BetaHuhn/deploy-to-vercel-action@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          CREATE_COMMENT: false
       - uses: phulsechinmay/rewritable-pr-comment@v0.3.0
+        if: ${{ steps.vercel-deploy.outputs.DEPLOYMENT_CREATED }}
         with:
           message: |
             This pull request has been deployed to Vercel.
@@ -44,5 +40,5 @@ jobs:
             <img src='${{ steps.vercel-deploy.outputs.PREVIEW_URL }}/fullpage.png' alt='image'/>
 
             [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           COMMENT_IDENTIFIER: "vercel-deploy"
