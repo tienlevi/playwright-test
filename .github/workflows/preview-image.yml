@@ -19,5 +19,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,  // Add the pull request number
-              body: `**Welcome**, new contributor!\n\nPlease make sure you've read our [contributing guide](CONTRIBUTING.md) and we look forward to reviewing your Pull request shortly ✨`
+              body: `**Welcome**, new contributor!\n\nPlease make sure you've read our [contributing guide](CONTRIBUTING.md) and we look forward to reviewing your Pull request shortly ✨
+              ![Image](public/fullpage.png)
+              `
             });
