@@ -7,23 +7,17 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      pull-requests: write
 
     steps:
-      - name: Comment on new issue
+      - name: Comment on new pull request
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const comment = [
-              ``,
-              `We appreciate your help! 💖`
-            ].join('\n');
-
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `**Welcome**, new contributor!
-
-                Please make sure you've read our [contributing guide](CONTRIBUTING.md) and we look forward to reviewing your Pull request shortly ✨`
+              issue_number: context.issue.number,  // Add the pull request number
+              body: `**Welcome**, new contributor!\n\nPlease make sure you've read our [contributing guide](CONTRIBUTING.md) and we look forward to reviewing your Pull request shortly ✨`
             });
