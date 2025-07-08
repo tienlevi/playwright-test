@@ -1,23 +1,50 @@
 name: Comment on Pull Request
 
 on:
+  push:
+    branches: [main]
   pull_request:
-
+    types: [opened, synchronize, reopened]
 jobs:
-  comment:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
-      - name: Comment on new pull request
-        uses: actions/github-script@v7
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,  // Add the pull request number
-              body: `**Welcome**, new contributor!\n\nPlease make sure you've read our [contributing guide](CONTRIBUTING.md) and we look forward to reviewing your Pull request shortly ✨`
-            });
+          node-version: "18"
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+      - name: Deploy to Vercel Action
+        id: vercel-deploy
+        uses: BetaHuhn/deploy-to-vercel-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          CREATE_COMMENT: false
+      - uses: phulsechinmay/rewritable-pr-comment@v0.3.0
+        if: ${{ steps.vercel-deploy.outputs.DEPLOYMENT_CREATED }}
+        with:
+          message: |
+            This pull request has been deployed to Vercel.
+
+            <table>
+              <tr>
+                <td><strong>✅ Preview:</strong></td>
+                <td><a href='${{ steps.vercel-deploy.outputs.PREVIEW_URL }}'>${{ steps.vercel-deploy.outputs.PREVIEW_URL }}</a></td>
+              </tr>
+              <tr>
+                <td><strong>🔍 Inspect:</strong></td>
+                <td><a href='${{ steps.vercel-deploy.outputs.DEPLOYMENT_INSPECTOR_URL }}'>${{ steps.vercel-deploy.outputs.DEPLOYMENT_INSPECTOR_URL }}</a></td>
+              </tr>
+            </table>
+            <img src='${{ steps.vercel-deploy.outputs.PREVIEW_URL }}/fullpage.png' alt='image'/>
+
+            [View Workflow Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          COMMENT_IDENTIFIER: "vercel-deploy"
