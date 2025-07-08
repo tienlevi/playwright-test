@@ -1,16 +1,10 @@
 import axios from "axios";
-import { BASE_URL } from "../constants";
-
-export interface Post {
-  userId: number;
-  id: number;
-  title: string;
-  body: string;
-}
+import { apiUrl } from "../constants";
+import { Post } from "../interface/post";
 
 export const getPosts = async (): Promise<Post[]> => {
   try {
-    const response = await axios.get(`${BASE_URL}/posts`);
+    const response = await axios.get(`${apiUrl}/posts`);
 
     return response.data;
   } catch (error) {
@@ -21,7 +15,7 @@ export const getPosts = async (): Promise<Post[]> => {
 
 export const getPostById = async (id: number): Promise<Post> => {
   try {
-    const response = await axios.get(`${BASE_URL}/posts/${id}`);
+    const response = await axios.get(`${apiUrl}/posts/${id}`);
 
     return response.data;
   } catch (error) {

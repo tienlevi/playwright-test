@@ -1,5 +1,5 @@
 import usePost from "../hooks/usePost";
-import { Post } from "../services/posts";
+import { Post } from "../interface/post";
 
 function Posts() {
   const { data, isLoading, error } = usePost();
@@ -20,12 +20,11 @@ function Posts() {
     );
   }
 
-  // Ensure data is treated as an array of valid Post objects
   const posts = Array.isArray(data) ? data : data ? [data] : [];
 
   return (
     <div className="lists space-y-4">
-      {posts.slice(0, 20).map((post: Post) => (
+      {posts.slice(0, 5).map((post: Post) => (
         <div
           key={post.id}
           className="bg-white rounded-lg p-4 shadow transition-shadow hover:shadow-md"
