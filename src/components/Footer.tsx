@@ -47,16 +47,16 @@ const Footer = ({
   ];
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 mt-8">
+    <footer className="bg-blue-500 border-t border-gray-200 mt-8">
       <div className="mx-auto max-w-4xl px-4 py-8">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
             <a href="/" className="flex items-center">
-              <span className="self-center text-xl font-semibold text-gray-900">
+              <span className="self-center text-xl font-semibold text-white">
                 YourLogo
               </span>
             </a>
-            <p className="mt-2 text-sm text-gray-600 max-w-xs">
+            <p className="mt-2 text-sm text-white max-w-xs">
               A brief description about your company and what you offer to
               users.
             </p>
@@ -66,7 +66,7 @@ const Footer = ({
             {footerLinks.map((section) => (
               <div key={section.title}>
                 <div
-                  className="mb-2 font-semibold text-gray-900 md:mb-4 flex justify-between items-center cursor-pointer md:cursor-default"
+                  className="mb-2 font-semibold text-white md:mb-4 flex justify-between items-center cursor-pointer md:cursor-default"
                   onClick={() => handleSectionToggle(section.title)}
                   onKeyDown={(e) => handleKeyDown(e, section.title)}
                   tabIndex={0}
@@ -91,7 +91,7 @@ const Footer = ({
                   </svg>
                 </div>
                 <ul
-                  className={`text-gray-600 space-y-2 ${
+                  className={`text-white space-y-2 ${
                     activeSection === section.title ? "block" : "hidden"
                   } md:block`}
                   aria-hidden={
@@ -102,7 +102,7 @@ const Footer = ({
                     <li key={link.name}>
                       <a
                         href={link.href}
-                        className="text-gray-600 hover:text-gray-900 hover:underline"
+                        className="text-white hover:text-white hover:underline"
                         tabIndex={0}
                         aria-label={link.name}
                       >
@@ -119,11 +119,11 @@ const Footer = ({
         <hr className="my-6 border-gray-200 sm:mx-auto" />
 
         <div className="sm:flex sm:items-center sm:justify-between">
-          <span className="text-sm text-gray-600">{copyrightText}</span>
+          <span className="text-sm text-white">{copyrightText}</span>
           <div className="flex mt-4 space-x-6 sm:mt-0">
             <a
               href="https://facebook.com"
-              className="text-gray-500 hover:text-gray-900"
+              className="text-white hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
               tabIndex={0}
@@ -144,7 +144,7 @@ const Footer = ({
             </a>
             <a
               href="https://twitter.com"
-              className="text-gray-500 hover:text-gray-900"
+              className="text-white hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
               tabIndex={0}
@@ -161,7 +161,7 @@ const Footer = ({
             </a>
             <a
               href="https://github.com"
-              className="text-gray-500 hover:text-gray-900"
+              className="text-white hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
               tabIndex={0}
