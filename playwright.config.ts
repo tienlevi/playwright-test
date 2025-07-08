@@ -22,13 +22,12 @@ export default defineConfig({
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    baseURL: "https://playwright-test-flax.vercel.app",
+    baseURL: "http://localhost:5173",
     trace: "on-first-retry",
   },
   webServer: {
-    command: "yarn dev",
+    command: "pnpm dev",
   },
-  outputDir: "./src/tests/images",
 
   /* Configure projects for major browsers */
   projects: [

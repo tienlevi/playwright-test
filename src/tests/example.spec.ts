@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
-import { BASE_URL } from "../constants";
+import { apiUrl } from "../constants";
 
 const baseLocal = "http://localhost:5173";
 const baseURL = "https://playwright-test-flax.vercel.app";
 
 test("Screenshots", async ({ page, request }) => {
   // First fetch API data
-  const response = await request.get(`${BASE_URL}/posts`);
+  const response = await request.get(`${apiUrl}/posts`);
   expect(response.ok()).toBeTruthy();
 
   // Navigate to the page
@@ -14,7 +14,7 @@ test("Screenshots", async ({ page, request }) => {
 
   // Wait for the posts to be visible
   const listsLocator = page.locator(".lists");
-  await expect(listsLocator).toBeVisible();
+  await expect(listsLocator).toBeVisible({ timeout: 10000 });
 
   // Verify posts are rendered
   const listItems = page.locator('[role="listitem"]');
