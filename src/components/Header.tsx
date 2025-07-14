@@ -24,7 +24,7 @@ const Header = ({
   };
 
   return (
-    <header className="bg-blue-500 border-b border-gray-200 py-4">
+    <header className="bg-gray-500 border-b border-gray-200 py-4">
       <div className="mx-auto max-w-4xl px-4 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">{title}</h1>
@@ -70,7 +70,7 @@ const Header = ({
                   <a
                     key={item}
                     href="/"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-white"
                     tabIndex={0}
                     aria-label="Home"
                   >
@@ -87,7 +87,7 @@ const Header = ({
                 <a
                   key={item}
                   href="/"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-white"
                   tabIndex={0}
                   aria-label="Home"
                 >
