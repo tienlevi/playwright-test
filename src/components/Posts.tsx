@@ -20,11 +20,9 @@ function Posts() {
     );
   }
 
-  const posts = Array.isArray(data) ? data : data ? [data] : [];
-
   return (
     <div className="lists space-y-4">
-      {posts.slice(0, 5).map((post: Post) => (
+      {data?.slice(0, 5).map((post: Post) => (
         <div
           key={post.id}
           className="bg-white rounded-lg p-4 shadow transition-shadow hover:shadow-md"
