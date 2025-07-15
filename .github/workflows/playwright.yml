@@ -32,7 +32,7 @@ jobs:
             const output = fs.readFileSync('./output.log', 'utf8');
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
 
-            await github.rest.issues.createComment({
+            github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -40,7 +40,7 @@ jobs:
               });
 
             if (hasSnapshotError) {
-            await github.rest.issues.createComment({
+            github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
