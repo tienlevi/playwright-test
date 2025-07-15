@@ -1,6 +1,13 @@
 import usePost from "../hooks/usePost";
 import { Post } from "../interface/post";
 
+/**
+ * Displays a list of up to five posts, showing a loading spinner while fetching and an error message if loading fails.
+ *
+ * Fetches posts using a custom hook and renders each post's title, body, and metadata in a styled card layout.
+ *
+ * @returns The rendered posts list, a loading indicator, or an error message.
+ */
 function Posts() {
   const { data, isLoading, error } = usePost();
 
