@@ -21,8 +21,7 @@ jobs:
       - name: Run Playwright tests
         run: |
           pnpm exec playwright test | tee output.log
-      - name: Check for snapshot issues and post comment when failed
-        if: failure() # Only run if tests fail
+      - name: Check for snapshot issues and post comment
         uses: actions/github-script@v7
         with:
           script: |
@@ -30,24 +29,21 @@ jobs:
             const output = fs.readFileSync('./output.log', 'utf8');
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
 
+            github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `Playwright tests success`
+              });
+
             if (hasSnapshotError) {
-              github.rest.issues.createComment({
+            github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: `Playwright tests failed. See the [Playwright report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/1}) for details.`
               });
             }
-      - name: Check for snapshot issues and post comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: ``
-            });
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always() # Upload even if tests fail
