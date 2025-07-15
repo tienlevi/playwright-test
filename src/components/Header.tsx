@@ -24,7 +24,7 @@ const Header = ({
   };
 
   return (
-    <header className="bg-blue-500 border-b border-blue-200 py-4">
+    <header className="bg-red-500 border-b border-blue-200 py-4">
       <div className="mx-auto max-w-4xl px-4 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">{title}</h1>
@@ -38,7 +38,7 @@ const Header = ({
               aria-expanded={isMenuOpen}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               aria-controls="mobile-menu"
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-2 rounded-md text-white hover:text-white/80 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={handleMenuToggle}
               onKeyDown={handleKeyDown}
             >
