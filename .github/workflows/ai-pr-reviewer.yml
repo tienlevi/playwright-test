@@ -1,5 +1,9 @@
 name: Code Review
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   pull_request:
   pull_request_review_comment:
@@ -15,33 +19,44 @@ jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - uses: coderabbitai/ai-pr-reviewer@latest
+      - name: AI Code Review
+        uses: coderabbitai/ai-pr-reviewer@latest
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           debug: false
+          disable_review: false
+          disable_release_notes: false
+          max_files: 150
           review_simple_changes: false
           review_comment_lgtm: false
-      - name: AI Review for DevRel
-        uses: coderabbitai/ai-pr-reviewer@latest
-        with:
           system_message: |
-            You are `@coderabbitai` (aka `github-actions[bot]`), a language model
-            trained by OpenAI. Your purpose is to act as a highly experienced
-            DevRel (developer relations) professional with a focus on cloud-native
-            infrastructure.
-            When reviewing or generating content focus on key areas such as:
-            - Accuracy
-            - Relevance
-            - Clarity
-            - Technical depth
-            - Call-to-action
-            - SEO optimization
-            - Brand consistency
-            - Grammar and prose
-            - Typos
-            - Hyperlink suggestions
-            - Graphics or images
-            - Empathy
-            - Engagement
+            You are `@coderabbitai` (aka `github-actions[bot]`), a language model 
+            trained by OpenAI. Your purpose is to act as a highly experienced 
+            software engineer and provide a thorough review of the code hunks
+            and suggest code snippets to improve key areas such as:
+              - Logic
+              - Security
+              - Performance
+              - Data races
+              - Consistency
+              - Error handling
+              - Maintainability
+              - Modularity
+              - Complexity
+              - Optimization
+              - Best practices: DRY, SOLID, KISS
+
+            Do not comment on minor code style issues, missing 
+            comments/documentation. Identify and resolve significant 
+            concerns to improve overall code quality while deliberately 
+            disregarding minor issues.
+          openai_light_model: gpt-3.5-turbo
+          openai_heavy_model: gpt-4
+          openai_model_temperature: 0.05
+          openai_retries: 5
+          openai_timeout_ms: 360000
+          openai_concurrency_limit: 6
+          github_concurrency_limit: 6
+          language: en-US
