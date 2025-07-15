@@ -1,0 +1,22 @@
+# .coderabbit.yaml
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+reviews:
+  path_filters:
+    # Include common file types for review
+    - "**/*.ts"
+    - "**/*.tsx"
+    - "**/*.js"
+    - "**/*.jsx"
+    - "**/*.json"
+    - "**/*.md"
+    - "**/*.png" # Explicitly include PNG files
+    - "**/*.jpg" # Include other image formats if needed
+    - "**/*.jpeg"
+    - "**/*.gif"
+    - "**/*.svg"
+    # Exclude build/generated files
+    - "!node_modules/**"
+    - "!dist/**"
+    - "!build/**"
+    - "!.next/**"
