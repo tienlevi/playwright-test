@@ -15,27 +15,41 @@ jobs:
         with:
           node-version: lts/*
       - name: Install dependencies
+        run: npm install
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build project
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Install dependencies
         run: npm install -g pnpm && pnpm install
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
         run: |
           pnpm exec playwright test | tee output.log
-      - name: Check for snapshot issues and post comment
-        # if: failure() # Only run if tests fail
+      - name: Check for snapshot issues and post comment when failed
+        if: failure() # Only run if tests fail
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const output = fs.readFileSync('./output.log', 'utf8');
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Playwright tests success. See the [Playwright report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/1}) for details.`
-            });
 
             if (hasSnapshotError) {
               github.rest.issues.createComment({
@@ -45,9 +59,19 @@ jobs:
                 body: `Playwright tests failed. See the [Playwright report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/1}) for details.`
               });
             }
+      - name: Check for snapshot issues and post comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${{ steps.deploy.outputs.url }}`
+            });
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
-        # if: always() # Upload even if tests fail
+        if: always() # Upload even if tests fail
         with:
           name: playwright-report
           path: public/fullpage.png
