@@ -5,6 +5,8 @@ type HeaderProps = {
   description?: string;
 };
 
+const navbarItems = ["Home", "About", "Contact"];
+
 const Header = ({
   title = "Posts Feed",
   description = "Browse through the latest posts",
@@ -22,7 +24,7 @@ const Header = ({
   };
 
   return (
-    <header className="bg-blue-500 border-b border-gray-200 py-4">
+    <header className="bg-gray-500 border-b border-gray-200 py-4">
       <div className="mx-auto max-w-4xl px-4 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">{title}</h1>
@@ -64,60 +66,34 @@ const Header = ({
                 id="mobile-menu"
                 className="absolute top-16 left-0 right-0 bg-white border-b border-gray-200 py-2 shadow-lg"
               >
-                <a
-                  href="/"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  tabIndex={0}
-                  aria-label="Home"
-                >
-                  Home
-                </a>
-                <a
-                  href="/about"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  tabIndex={0}
-                  aria-label="About"
-                >
-                  About
-                </a>
-                <a
-                  href="/contact"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  tabIndex={0}
-                  aria-label="Contact"
-                >
-                  Contact
-                </a>
+                {navbarItems.map((item) => (
+                  <a
+                    key={item}
+                    href="/"
+                    className="block px-4 py-2 text-white"
+                    tabIndex={0}
+                    aria-label="Home"
+                  >
+                    {item}
+                  </a>
+                ))}
               </div>
             )}
           </div>
 
           <div className="hidden md:block">
             <div className="flex space-x-4">
-              <a
-                href="/"
-                className="px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md"
-                tabIndex={0}
-                aria-label="Home"
-              >
-                Home
-              </a>
-              <a
-                href="/about"
-                className="px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md"
-                tabIndex={0}
-                aria-label="About"
-              >
-                About
-              </a>
-              <a
-                href="/contact"
-                className="px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md"
-                tabIndex={0}
-                aria-label="Contact"
-              >
-                Contact
-              </a>
+              {navbarItems.map((item) => (
+                <a
+                  key={item}
+                  href="/"
+                  className="block px-4 py-2 text-white"
+                  tabIndex={0}
+                  aria-label="Home"
+                >
+                  {item}
+                </a>
+              ))}
             </div>
           </div>
         </nav>
