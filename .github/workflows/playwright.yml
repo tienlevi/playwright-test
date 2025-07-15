@@ -21,6 +21,22 @@ jobs:
       - name: Run Playwright tests
         run: |
           pnpm exec playwright test | tee output.log
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+
       - name: Check for snapshot issues and post comment
         uses: actions/github-script@v7
         with:
@@ -30,11 +46,11 @@ jobs:
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
 
             github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `Playwright tests success`
-              });
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Preview URL for branch **${{ github.head_ref }}**: ${{ steps.deploy.outputs.url }}`
+            })
 
             if (hasSnapshotError) {
             github.rest.issues.createComment({
