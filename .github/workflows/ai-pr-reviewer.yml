@@ -10,9 +10,7 @@ on:
     types: [created]
 
 concurrency:
-  group: ${{ github.repository }}-${{ github.event.number || github.head_ref ||
-    github.sha }}-${{ github.workflow }}-${{ github.event_name ==
-    'pull_request_review_comment' && 'pr_comment' || 'pr' }}
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}-${{ github.event_name == 'pull_request_review_comment' && 'pr_comment' || 'pr' }}
   cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
 
 jobs:
@@ -22,10 +20,10 @@ jobs:
       - name: AI Code Review
         uses: coderabbitai/ai-pr-reviewer@latest
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
-          debug: false
+          github-token: ${{ secrets.GIT_TOKEN }} # Explicitly pass default token
+          debug: true # Enable for troubleshooting
           disable_review: false
           disable_release_notes: false
           max_files: 150
@@ -47,7 +45,6 @@ jobs:
               - Complexity
               - Optimization
               - Best practices: DRY, SOLID, KISS
-
             Do not comment on minor code style issues, missing 
             comments/documentation. Identify and resolve significant 
             concerns to improve overall code quality while deliberately 
