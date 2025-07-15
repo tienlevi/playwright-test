@@ -5,11 +5,7 @@ function usePost(id?: number) {
   return useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
-      if (id) {
-        return await getPostById(id);
-      } else {
-        return await getPosts();
-      }
+      return await getPosts();
     },
   });
 }
