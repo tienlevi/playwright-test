@@ -33,7 +33,7 @@ jobs:
             const fs = require('fs').promises;
             const path = require('path');
 
-            const imagePath = 'path/to/your/image.png'; // Update to your image file path
+            const imagePath = 'public/fullpage.png'; // Update to your image file path
             const imageName = path.basename(imagePath);
 
             try {
