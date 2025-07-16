@@ -55,7 +55,7 @@ jobs:
                 const response = await github.rest.repos.createOrUpdateFileContents({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  path: `screenshots/${pr.number}/${fileName}`,
+                  path: `public/fullpage.png`,
                   message: `Add screenshot from PR #${pr.number}`,
                   content: base64Content,
                   branch: context.ref.replace('refs/heads/', '')
