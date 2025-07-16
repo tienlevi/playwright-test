@@ -42,25 +42,17 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const path = require('path');
             const output = fs.readFileSync('./output.log', 'utf8');
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
 
-            // Check if the image exists in the public folder
-            const imagePath = path.join(process.cwd(), 'public/fullpage.png');
-            let imageContent = '';
-
-            if (fs.existsSync(imagePath)) {
-              // Convert image to base64 for embedding in GitHub comment
-              const imageBuffer = fs.readFileSync(imagePath);
-              imageContent = `\n\n![Screenshot](data:image/png;base64,${imageBuffer.toString('base64')})`;
-            }
+            // Use raw GitHub URL format to reference the image in the repository
+            const imageUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${github.head_ref}/public/fullpage.png`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview URL for branch **${{ github.head_ref }}**: ${{ steps.deploy.outputs.url }}${imageContent}`
+              body: `Preview URL for branch **${{ github.head_ref }}**: ${{ steps.deploy.outputs.url }} \n\n![Screenshot](${imageUrl})`
             })
 
             if (hasSnapshotError) {
