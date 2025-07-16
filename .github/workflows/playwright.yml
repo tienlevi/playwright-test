@@ -1,67 +1,61 @@
-name: Playwright Tests
+name: Playwright Snapshots to PR
+
 on:
   pull_request:
-    branches: [main]
+    types: [opened, synchronize]
+
 jobs:
-  playwright:
-    timeout-minutes: 60
+  playwright-snapshots:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Install dependencies
-        run: npm install -g pnpm && pnpm install
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
       - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: List snapshot images
+        id: list_images
         run: |
-          pnpm exec playwright test | tee output.log
-      - name: Check for image
-        id: check-image
+          mkdir -p snapshots-pr
+          find ./playwright-report -type f -name "*.png" -exec cp {} snapshots-pr/ \;
+          ls snapshots-pr
+          echo "FILES=$(ls snapshots-pr | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+
+      - name: Commit snapshots to PR branch
         run: |
-          if [ -f "public/fullpage.png" ]; then
-            echo "Image found at public/fullpage.png"
-            echo "image_found=true" >> $GITHUB_OUTPUT
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p pr-snapshots
+          cp snapshots-pr/* pr-snapshots/
+          git add pr-snapshots
+          if git diff --cached --quiet; then
+            echo "No new screenshots"
           else
-            echo "Image not found at public/fullpage.png"
-            echo "image_found=false" >> $GITHUB_OUTPUT
-            exit 1
+            git commit -m "Add PR snapshots"
+            git push origin HEAD:${{ github.head_ref }}
           fi
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: public/fullpage.png
-          retention-days: 1
-      - name: Check for snapshot issues and post comment
+
+      - name: Comment on PR with screenshots
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const output = fs.readFileSync('./output.log', 'utf8');
-            const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
-            const imageFound = "${{ steps.check-image.outputs.image_found }}";
-            // Use raw GitHub URL format to reference the image in the repository
-            const comment = imageFound === "true"
-              ? "✅ Image `public/fullpage.png` was successfully retrieved and processed. Check the workflow artifacts for the image."
-              : "❌ Image `public/fullpage.png` was not found in the project.";
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const pr = context.payload.pull_request;
+            const files = "${{ steps.list_images.outputs.FILES }}".split(',');
+            const imageMarkdown = files.map(file =>
+              `![${file}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/pr-snapshots/${file})`
+            ).join('\n\n');
+
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview Image /n ![Image](public/fullpage.png)`
-            })
-
-            if (hasSnapshotError) {
-            github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `Playwright tests failed. See the [Playwright report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/1}) for details.`
-              });
-            }
+              issue_number: pr.number,
+              body: `🧪 **Playwright Snapshots:**\n\n${imageMarkdown}`
+            });
