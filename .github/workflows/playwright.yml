@@ -31,13 +31,13 @@ jobs:
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
 
             // Use raw GitHub URL format to reference the image in the repository
-            const imageUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${github.head_ref}/public/fullpage.png`;
+            const userRaw = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo};
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview URL for branch **${{ github.head_ref }} \n\n![Screenshot](${imageUrl})`
+              body: `Preview URL for branch **${{ github.head_ref }} \n\n![Screenshot](${userRaw}/${{ github.head_ref }}/public/fullpage.png`)`
             })
 
             if (hasSnapshotError) {
