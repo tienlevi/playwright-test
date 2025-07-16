@@ -47,8 +47,8 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          cp downloaded-screenshot/fullpage.png ./pr-screenshot.png
-          git add pr-screenshot.png
+          cp downloaded-screenshot/fullpage.png ./fullpage.png
+          git add fullpage.png
           git commit -m "Add PR screenshot" || echo "No changes"
           git push
 
@@ -57,7 +57,7 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const imageUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/pr-screenshot.png`;
+            const imageUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/fullpage.png`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
