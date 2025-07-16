@@ -27,30 +27,22 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Start dev server
-        run: pnpm run dev &
-        env:
-          VITE_PORT: 5173
-
-      - name: Wait for dev server to start
-        run: npx wait-on http://localhost:5173 -t 60000
-
       - name: Run Playwright tests
         run: pnpm exec playwright test
 
       - name: List snapshot images
         id: list_images
         run: |
-          mkdir -p snapshots-pr
-          find ./playwright-report -type f -name "*.png" -exec cp {} snapshots-pr/ \;
-          echo "FILES=$(ls snapshots-pr | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+          mkdir -p public
+          find ./public -type f -name "*.png" -exec cp {} public/ \;
+          echo "FILES=$(ls public | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
 
       - name: Commit snapshots to PR branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p pr-snapshots
-          cp snapshots-pr/* pr-snapshots/
+          cp public/* pr-snapshots/
           git add pr-snapshots
           if git diff --cached --quiet; then
             echo "No new screenshots"
