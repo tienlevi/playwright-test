@@ -21,7 +21,23 @@ jobs:
       - name: Run Playwright tests
         run: |
           pnpm exec playwright test | tee output.log
-
+      - name: Check for image
+        id: check-image
+        run: |
+          if [ -f "public/fullpage.png" ]; then
+            echo "Image found at public/fullpage.png"
+            echo "image_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "Image not found at public/fullpage.png"
+            echo "image_found=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: public/fullpage.png
+          retention-days: 1
       - name: Check for snapshot issues and post comment
         uses: actions/github-script@v7
         with:
@@ -29,15 +45,16 @@ jobs:
             const fs = require('fs');
             const output = fs.readFileSync('./output.log', 'utf8');
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
-
+            const imageFound = "${{ steps.check-image.outputs.image_found }}";
             // Use raw GitHub URL format to reference the image in the repository
-            const userRaw = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo};
-
+            const comment = imageFound === "true"
+              ? "✅ Image `public/fullpage.png` was successfully retrieved and processed. Check the workflow artifacts for the image."
+              : "❌ Image `public/fullpage.png` was not found in the project.";
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview URL for branch **${{ github.head_ref }} \n\n![Screenshot](${userRaw}/${{ github.head_ref }}/public/fullpage.png`)`
+              body: `Preview URL for branch `
             })
 
             if (hasSnapshotError) {
@@ -48,9 +65,3 @@ jobs:
                 body: `Playwright tests failed. See the [Playwright report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/1}) for details.`
               });
             }
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: public/fullpage.png
-          retention-days: 1
