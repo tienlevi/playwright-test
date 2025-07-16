@@ -44,7 +44,7 @@ jobs:
             const fs = require('fs');
             const output = fs.readFileSync('./output.log', 'utf8');
             const hasSnapshotError = /Error: A snapshot doesn't exist at|Screenshot comparison failed/.test(output);
-            const imageUrl = require('./public/fullpage.png')
+            const imageUrl = require('../../public/fullpage.png')
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
