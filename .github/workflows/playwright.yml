@@ -1,121 +1,66 @@
-name: PR Screenshot Preview
+name: Upload Image to Release and Comment on Pull Request
 
 on:
   pull_request:
     types: [opened, synchronize]
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  screenshot-comment:
+  upload-and-comment:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write # Required for uploading release assets
+      pull-requests: write # Required for commenting on pull requests
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Create Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: 10
+          tag_name: pr-${{ github.event.pull_request.number }}-release
+          release_name: PR #${{ github.event.pull_request.number }} Release
+          draft: false
+          prerelease: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
-
-      - name: Run Playwright tests
-        run: pnpm exec playwright test
-
-      - name: Upload screenshots and comment on PR
+      - name: Upload Image and Comment
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
+            const fs = require('fs').promises;
             const path = require('path');
 
-            const pr = context.payload.pull_request;
-            const screenshotDir = 'public';
+            const imagePath = 'path/to/your/image.png'; // Update to your image file path
+            const imageName = path.basename(imagePath);
 
-            // Function to upload image to GitHub
-            async function uploadImage(imagePath, fileName) {
-              try {
-                const imageBuffer = fs.readFileSync(imagePath);
-                const base64Content = imageBuffer.toString('base64');
-                
-                const response = await github.rest.repos.createOrUpdateFileContents({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  path: `public/fullpage.png`,
-                  message: `Add screenshot from PR #${pr.number}`,
-                  content: base64Content,
-                  branch: context.ref.replace('refs/heads/', '')
-                });
-                
-                return response.data.content.download_url;
-              } catch (error) {
-                console.error(`Error uploading ${fileName}:`, error);
-                return null;
-              }
-            }
+            try {
+              // Read the image file
+              const imageData = await fs.readFile(imagePath);
 
-            // Check for screenshots in public directory
-            let screenshotUrls = [];
-
-            if (fs.existsSync(screenshotDir)) {
-              const files = fs.readdirSync(screenshotDir);
-              const imageFiles = files.filter(file => 
-                file.toLowerCase().match(/\.(png|jpg|jpeg|gif|webp)$/i)
-              );
-              
-              console.log('Found image files:', imageFiles);
-              
-              for (const file of imageFiles) {
-                const filePath = path.join(screenshotDir, file);
-                console.log(`Uploading ${file}...`);
-                const url = await uploadImage(filePath, file);
-                if (url) {
-                  screenshotUrls.push({ name: file, url: url });
+              // Upload the image as a release asset
+              const uploadResponse = await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.create-release.outputs.id }},
+                name: imageName,
+                data: imageData,
+                headers: {
+                  'content-type': 'image/png' // Adjust based on image type
                 }
-              }
-            }
+              });
 
-            // Create comment with screenshots
-            if (screenshotUrls.length > 0) {
-              let commentBody = `🧪 **Playwright Test Screenshots**\n\n`;
-              commentBody += `Screenshots captured from PR #${pr.number}:\n\n`;
-              
-              for (const screenshot of screenshotUrls) {
-                commentBody += `### ${screenshot.name}\n`;
-                commentBody += `![${screenshot.name}](${screenshot.url})\n\n`;
-              }
-              
-              commentBody += `---\n`;
-              commentBody += `🔍 These screenshots show the visual state of your application during testing.\n`;
-              commentBody += `📅 Generated on: ${new Date().toISOString()}\n`;
-              
+              // Comment on the pull request with the image link
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: pr.number,
-                body: commentBody
+                issue_number: context.payload.pull_request.number,
+                body: `Uploaded image to release: [${imageName}](${uploadResponse.data.browser_download_url})`
               });
-            } else {
-              console.log('No screenshots found in public directory');
-              
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: `🧪 **Playwright Tests Completed**\n\nNo screenshots were generated during this test run.`
-              });
+
+              console.log(`Successfully uploaded ${imageName} to release and commented on PR #${context.payload.pull_request.number}`);
+            } catch (error) {
+              core.setFailed(`Failed to upload image or comment: ${error.message}`);
             }
