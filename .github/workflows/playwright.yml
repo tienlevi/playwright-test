@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -38,8 +40,8 @@ jobs:
       - name: List snapshot images from public folder
         id: list_images
         run: |
-          if [ -d "public/snapshots" ]; then
-            echo "FILES=$(ls public/snapshots/*.png | xargs -n1 basename | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+          if [ -d "public" ]; then
+            echo "FILES=$(ls public/*.png | xargs -n1 basename | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
           else
             echo "FILES=" >> $GITHUB_OUTPUT
           fi
@@ -48,7 +50,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout ${{ github.head_ref }}
           git add public/*.png || true
           if git diff --cached --quiet; then
             echo "No new screenshots to commit"
@@ -72,7 +73,7 @@ jobs:
             }
 
             const imageMarkdown = files.map(file =>
-              `![${file}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/snapshots/${file})`
+              `![${file}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${file})`
             ).join('\n\n');
 
             await github.rest.issues.createComment({
