@@ -54,7 +54,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview URL for branch `
+              body: `Preview Image /n ${comment}`
             })
 
             if (hasSnapshotError) {
