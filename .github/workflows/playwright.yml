@@ -12,36 +12,28 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js and pnpm
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "pnpm"
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-          run_install: false
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
+      - name: Install dependencies with pnpm
         run: pnpm install
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
+
+      - name: Start dev server
+        run: pnpm run dev &
+        env:
+          VITE_PORT: 5173
+
+      - name: Wait for dev server to start
+        run: npx wait-on http://localhost:5173 -t 60000
 
       - name: Run Playwright tests
         run: pnpm exec playwright test
@@ -49,16 +41,16 @@ jobs:
       - name: List snapshot images
         id: list_images
         run: |
-          mkdir -p public
-          find ./playwright-report -type f -name "*.png" -exec cp {} public/ \;
-          echo "FILES=$(ls public | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+          mkdir -p snapshots-pr
+          find ./playwright-report -type f -name "*.png" -exec cp {} snapshots-pr/ \;
+          echo "FILES=$(ls snapshots-pr | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
 
       - name: Commit snapshots to PR branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p pr-snapshots
-          cp public/* pr-snapshots/
+          cp snapshots-pr/* pr-snapshots/
           git add pr-snapshots
           if git diff --cached --quiet; then
             echo "No new screenshots"
