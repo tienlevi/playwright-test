@@ -1,48 +1,66 @@
-name: Playwright Tests
+name: Upload Image to Release and Comment on Pull Request
+
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    types: [opened, synchronize]
+
 jobs:
-  playwright:
-    timeout-minutes: 60
+  upload-and-comment:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write # Required for uploading release assets
+      pull-requests: write # Required for commenting on pull requests
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          node-version: lts/*
-      - name: Install dependencies
-        run: npm install -g pnpm && pnpm install
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
-      - name: Run Playwright tests
-        run: |
-          pnpm exec playwright test | tee output.log
-      - name: Check for snapshot issues and post comment
-        if: failure() # Only run if tests fail
+          tag_name: pr-${{ github.event.pull_request.number }}-release
+          release_name: PR #${{ github.event.pull_request.number }} Release
+          draft: false
+          prerelease: true
+
+      - name: Upload Image and Comment
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: artifacts } = await github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: process.env.GITHUB_RUN_ID,
-            });
-            const report = artifacts.artifacts.find(a => a.name === 'playwright-report');
-            if (report) {
-              body = `Playwright tests failed. See the [Playwright report](${report.archive_download_url}) for details.`;
-            } else {
-              body = `Playwright tests failed. Playwright report artifact not found.`;
+            const fs = require('fs').promises;
+            const path = require('path');
+
+            const imagePath = 'path/to/your/image.png'; // Update to your image file path
+            const imageName = path.basename(imagePath);
+
+            try {
+              // Read the image file
+              const imageData = await fs.readFile(imagePath);
+
+              // Upload the image as a release asset
+              const uploadResponse = await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: ${{ steps.create-release.outputs.id }},
+                name: imageName,
+                data: imageData,
+                headers: {
+                  'content-type': 'image/png' // Adjust based on image type
+                }
+              });
+
+              // Comment on the pull request with the image link
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `Uploaded image to release: [${imageName}](${uploadResponse.data.browser_download_url})`
+              });
+
+              console.log(`Successfully uploaded ${imageName} to release and commented on PR #${context.payload.pull_request.number}`);
+            } catch (error) {
+              core.setFailed(`Failed to upload image or comment: ${error.message}`);
             }
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always() # Upload even if tests fail
-        with:
-          name: playwright-report
-          path: test-results/
-          retention-days: 1
