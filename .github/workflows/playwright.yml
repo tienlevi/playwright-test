@@ -38,17 +38,17 @@ jobs:
       - name: List snapshot images
         id: list_images
         run: |
-          mkdir -p snapshots-pr
-          find ./playwright-report -type f -name "*.png" -exec cp {} snapshots-pr/ \;
-          ls snapshots-pr
-          echo "FILES=$(ls snapshots-pr | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+          mkdir -p playwright-report
+          find ./playwright-report -type f -name "*.png" -exec cp {} playwright-report/ \;
+          ls playwright-report
+          echo "FILES=$(ls playwright-report | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
 
       - name: Commit snapshots to PR branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p pr-snapshots
-          cp snapshots-pr/* pr-snapshots/
+          cp playwright-report/* pr-snapshots/
           git add pr-snapshots
           if git diff --cached --quiet; then
             echo "No new screenshots"
