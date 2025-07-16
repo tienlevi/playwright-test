@@ -12,25 +12,38 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Setup Node.js
+      - name: Setup Node.js and pnpm
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "pnpm"
 
-      - name: Install dependencies
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies with pnpm
         run: pnpm install
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
+      - name: Install wait-on utility
+        run: npm install -g wait-on
+
+      - name: Start development server
+        run: pnpm exec vite --host 0.0.0.0 & echo $! > dev-server.pid
+        env:
+          CI: true
+
+      - name: Wait for dev server to be ready
+        run: wait-on http-get://localhost:5173 -t 60000
+
       - name: Run Playwright tests
         run: pnpm exec playwright test
+
+      - name: Stop development server
+        if: always()
+        run: kill $(cat dev-server.pid) || true
 
       - name: List snapshot images
         id: list_images
