@@ -47,8 +47,8 @@ jobs:
 
       - name: Commit snapshot images to PR branch
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
           git add public/screenshots/*.png || true
           if git diff --cached --quiet; then
             echo "No new screenshots to commit"
