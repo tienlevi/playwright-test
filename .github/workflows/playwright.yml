@@ -73,9 +73,8 @@ jobs:
               return;
             }
 
-            const imageMarkdown = files.map(file =>
-              `![${file}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${file})`
-            ).join('\n\n');
+            const fullpageImage = files.find(file => file === 'fullpage.png')
+            const imageMarkdown = `![${fullpageImage}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${fullpageImage})`
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
