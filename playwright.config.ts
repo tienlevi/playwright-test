@@ -3,7 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./src/tests",
   fullyParallel: true,
-  reporter: [["html"], ["json", { outputFile: "test-results/results.json" }]],
+  reporter: "html",
   use: {
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
@@ -11,7 +11,6 @@ export default defineConfig({
   webServer: {
     command: "pnpm dev",
   },
-  // Configure snapshot settings
 
   projects: [
     {
