@@ -75,10 +75,37 @@ jobs:
 
             const fullpageImage = files.find(file => file === 'fullpage.png')
             const imageMarkdown = `![${fullpageImage}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${fullpageImage})`
+            const commentBody = `🧪 **Playwright Snapshot Previews:**\n\n${imageMarkdown}`
 
-            await github.rest.issues.createComment({
+            // Get all comments on the PR
+            const listComments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              body: `🧪 **Playwright Snapshot Previews:  **\n\n${imageMarkdown}`
-            });
+            })
+
+            // Find existing bot comment
+            const existingComment = listComments.data.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes(fullpageImage)
+            )
+
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: commentBody
+              });
+              console.log(`Updated existing comment with ID: ${existingComment.id}`);
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: commentBody
+              });
+              console.log('Created new comment');
+            }
