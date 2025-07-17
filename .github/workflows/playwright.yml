@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
   comment-snapshots:
@@ -44,15 +46,6 @@ jobs:
           if [ -d "public" ]; then
             FILES=$(ls public/*.png | xargs -n1 basename | tr '\n' ',' | sed 's/,$//')
             echo "FILES=$FILES" >> $GITHUB_OUTPUT
-            # Extract fullpage.png specifically
-            if [[ "$FILES" == *"fullpage.png"* ]]; then
-              echo "FULLPAGE=fullpage.png" >> $GITHUB_OUTPUT
-            else
-              echo "FULLPAGE=" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "FILES=" >> $GITHUB_OUTPUT
-            echo "FULLPAGE=" >> $GITHUB_OUTPUT
           fi
 
       - name: Commit snapshot images to PR branch
@@ -88,5 +81,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              body: `🧪 **Playwright Snapshot Previews:**\n\n${imageMarkdown}`
+              body: `🧪 **Playwright Snapshot Previews:  **\n\n${imageMarkdown}`
             });
