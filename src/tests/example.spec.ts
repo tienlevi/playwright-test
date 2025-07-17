@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 
-const baseLocal = "http://localhost:5173";
+const baseLocal = "https://playwright-test-flax.vercel.app";
 
 test("Screenshots", async ({ page }) => {
   await page.goto(baseLocal, { waitUntil: "networkidle" });

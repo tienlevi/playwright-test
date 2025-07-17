@@ -41,9 +41,19 @@ jobs:
         id: list_images
         run: |
           if [ -d "public" ]; then
-            echo "FILES=$(ls public/*.png | xargs -n1 basename | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+            # Get all PNG images in the public folder
+            FILES=$(ls public/*.png 2>/dev/null | xargs -n1 basename | tr '\n' ',' | sed 's/,$//')
+            echo "FILES=$FILES" >> $GITHUB_OUTPUT
+            
+            # Check specifically for fullpage.png
+            if [ -f "public/fullpage.png" ]; then
+              echo "FULLPAGE=fullpage.png" >> $GITHUB_OUTPUT
+            else
+              echo "FULLPAGE=" >> $GITHUB_OUTPUT
+            fi
           else
             echo "FILES=" >> $GITHUB_OUTPUT
+            echo "FULLPAGE=" >> $GITHUB_OUTPUT
           fi
 
       - name: Commit snapshot images to PR branch
@@ -65,19 +75,31 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             const files = "${{ steps.list_images.outputs.FILES }}".split(',').filter(Boolean);
+            const fullpage = "${{ steps.list_images.outputs.FULLPAGE }}";
 
             if (files.length === 0) {
               console.log("No snapshots found, skipping comment.");
               return;
             }
 
-            const imageMarkdown = files.map(file =>
-              `![${file}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${file})`
-            ).join('\n\n');
+            let commentBody = '🧪 **Playwright Snapshot Previews:**\n\n';
+
+            // Add fullpage snapshot with special formatting if it exists
+            if (fullpage) {
+              commentBody += `### Full Page Screenshot:\n![${fullpage}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${fullpage})\n\n`;
+            }
+
+            // Add other snapshots (excluding fullpage if it was already added)
+            const otherFiles = fullpage ? files.filter(file => file !== fullpage) : files;
+            if (otherFiles.length > 0) {
+              commentBody += `### Other Snapshots:\n${otherFiles.map(file =>
+                `![${file}](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/${pr.head.ref}/public/${file})`
+              ).join('\n\n')}`;
+            }
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              body: `🧪 **Playwright Snapshot Previews:**\n\n${imageMarkdown}`
+              body: commentBody
             });
