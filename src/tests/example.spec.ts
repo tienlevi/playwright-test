@@ -1,14 +1,12 @@
-import { test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-const baseLocal = "https://playwright-test-flax.vercel.app";
+const baseLocal = "http://localhost:5173";
 
-test("Screenshots", async ({ page }) => {
+test("Visual regression tests", async ({ page }) => {
   await page.goto(baseLocal, { waitUntil: "networkidle" });
 
-  await page.locator("header").screenshot({ path: "public/lists.png" });
-
-  await page.screenshot({
-    path: "public/fullpage.png",
+  // Test full page screenshot with automatic snapshot comparison
+  await expect(page).toHaveScreenshot("fullpage.png", {
     fullPage: true,
   });
 });
